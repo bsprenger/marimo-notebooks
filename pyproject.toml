@@ -1,0 +1,39 @@
+[project]
+name = "marimo-notebooks"
+version = "0.1.0"
+description = "A collection of marimo notebooks for interactive Python visualizations"
+readme = "README.md"
+license = { text = "MIT" }
+requires-python = ">=3.10"
+dependencies = [
+    "marimo>=0.9.0",
+    "numpy>=1.26.0",
+    "matplotlib>=3.8.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "ruff>=0.1.0",
+    "pytest>=7.0.0",
+]
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/marimo_notebooks"]
+
+[tool.uv]
+dev-dependencies = [
+    "ruff>=0.1.0",
+    "pytest>=7.0.0",
+]
+
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
+ignore = []
