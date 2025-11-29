@@ -103,13 +103,13 @@ def __(
         r = np.sqrt(x_val**2 + y_val**2)
 
         # Domain check: Can we reach?
-        if r > (L1 + L2) or r < abs(L1 - L2) or r == 0:
+        if r > (L1 + L2) or r < abs(L1 - L2) or r < 1e-10:
             valid_ik = False
         else:
             # Calculate Theta 2 (Elbow Down)
             cos_t2 = (x_val**2 + y_val**2 - L1**2 - L2**2) / (2 * L1 * L2)
             cos_t2 = np.clip(cos_t2, -1.0, 1.0)  # Numerical stability
-            t2_val = -np.arccos(cos_t2)  # Elbow down preferred often
+            t2_val = -np.arccos(cos_t2)  # Elbow-down configuration
 
             # Calculate Theta 1
             k1 = L1 + L2 * np.cos(t2_val)
@@ -339,9 +339,9 @@ def __(
             ### ⚠️ Out of Reach!
             The target $(x, y)$ is outside the workspace.
 
-            Mathematically, the term for $\\cos(\\theta_2)$ is
-            greater than 1 or less than -1.
-            Since domain of arccos is $[-1, 1]$, no real solution exists.
+            The target lies beyond the reachable area, which is bounded by
+            $(L_1 + L_2)$ and $|L_1 - L_2|$. As a result, $\\cos(\\theta_2)$
+            falls outside $[-1, 1]$, making arccos undefined.
             """
 
         math_md = mo.md(explanation)
