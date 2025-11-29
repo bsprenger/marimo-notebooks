@@ -49,8 +49,7 @@ def __(Circle, Wedge, np, plt):
     ax.set_aspect("equal")
     ax.set_title("Example: Circle and Wedge Patches")
 
-    fig
-    return ax, circle, fig, wedge
+    return fig,
 
 
 if __name__ == "__main__":
