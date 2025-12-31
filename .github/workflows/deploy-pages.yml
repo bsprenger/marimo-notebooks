@@ -58,7 +58,7 @@ jobs:
           done
           
           # Create an index.html that lists all notebooks
-          cat > dist/index.html << 'EOF'
+          cat > dist/index.html << EOF
           <!DOCTYPE html>
           <html lang="en">
           <head>
@@ -137,17 +137,17 @@ jobs:
             if [ -f "$html_file" ] && [ "$(basename "$html_file")" != "index.html" ]; then
               notebook_name=$(basename "$html_file" .html)
               # Convert underscores to spaces and capitalize for display
-              display_name=$(echo "$notebook_name" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g')
+              display_name=$(echo "$notebook_name" | sed 's/_/ /g' | awk '{for(i=1;i<=NF;i++) $i=toupper(substr($i,1,1)) tolower(substr($i,2))}1')
               echo "                  <li><a href=\"${notebook_name}.html\">📓 ${display_name}</a></li>" >> dist/index.html
             fi
           done
           
-          cat >> dist/index.html << 'EOF'
+          cat >> dist/index.html << EOF
               </ul>
               
               <footer>
                   <p>Built with <a href="https://marimo.io/" target="_blank">marimo</a> • 
-                  <a href="https://github.com/bsprenger/marimo-notebooks" class="github-link" target="_blank">View on GitHub</a></p>
+                  <a href="https://github.com/${{ github.repository }}" class="github-link" target="_blank">View on GitHub</a></p>
               </footer>
           </body>
           </html>
