@@ -2,7 +2,7 @@
 
 import marimo
 
-__generated_with = "0.1.0"
+__generated_with = "0.9.0"
 app = marimo.App(width="full")
 
 
@@ -120,7 +120,7 @@ def __(action_1, action_2, control_mode, np, theta1_state, theta2_state):
         try:
             J_inv = np.linalg.pinv(J)
             q_dot = J_inv @ p_dot
-        except:
+        except np.linalg.LinAlgError:
             q_dot = np.zeros(2)
 
     return (
