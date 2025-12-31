@@ -1,0 +1,176 @@
+name: Deploy Marimo Notebooks to GitHub Pages
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:  # Allows manual trigger from Actions tab
+
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🐍 Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: 📦 Install uv
+        uses: astral-sh/setup-uv@v4
+        with:
+          enable-cache: true
+
+      - name: 🔧 Install dependencies
+        run: |
+          uv sync
+
+      - name: 📄 Export notebooks to HTML-WASM
+        run: |
+          # Create output directory
+          mkdir -p dist
+          
+          # Export each notebook in the notebooks/ directory
+          # To add a new notebook: just add it to the notebooks/ directory
+          # and it will automatically be included in the deployment
+          for notebook in notebooks/*.py; do
+            if [ -f "$notebook" ] && [ "$(basename "$notebook")" != "__init__.py" ]; then
+              notebook_name=$(basename "$notebook" .py)
+              echo "📓 Exporting $notebook_name..."
+              uv run marimo export html-wasm "$notebook" \
+                -o "dist/${notebook_name}.html" \
+                --mode run
+            fi
+          done
+          
+          # Create an index.html that lists all notebooks
+          cat > dist/index.html << 'EOF'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+              <meta charset="UTF-8">
+              <meta name="viewport" content="width=device-width, initial-scale=1.0">
+              <title>Marimo Notebooks</title>
+              <style>
+                  body {
+                      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+                      max-width: 800px;
+                      margin: 50px auto;
+                      padding: 20px;
+                      line-height: 1.6;
+                      color: #333;
+                  }
+                  h1 {
+                      color: #2c3e50;
+                      border-bottom: 3px solid #3498db;
+                      padding-bottom: 10px;
+                  }
+                  .notebook-list {
+                      list-style: none;
+                      padding: 0;
+                  }
+                  .notebook-list li {
+                      margin: 15px 0;
+                      padding: 15px;
+                      background: #f8f9fa;
+                      border-left: 4px solid #3498db;
+                      border-radius: 4px;
+                      transition: transform 0.2s, box-shadow 0.2s;
+                  }
+                  .notebook-list li:hover {
+                      transform: translateX(5px);
+                      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+                  }
+                  .notebook-list a {
+                      text-decoration: none;
+                      color: #2980b9;
+                      font-weight: 500;
+                      font-size: 1.1em;
+                  }
+                  .notebook-list a:hover {
+                      color: #3498db;
+                  }
+                  .description {
+                      margin-top: 5px;
+                      color: #666;
+                      font-size: 0.9em;
+                  }
+                  footer {
+                      margin-top: 50px;
+                      padding-top: 20px;
+                      border-top: 1px solid #ddd;
+                      text-align: center;
+                      color: #7f8c8d;
+                  }
+                  a.github-link {
+                      color: #7f8c8d;
+                      text-decoration: none;
+                  }
+                  a.github-link:hover {
+                      color: #2c3e50;
+                  }
+              </style>
+          </head>
+          <body>
+              <h1>🎯 Marimo Notebooks</h1>
+              <p>Interactive Python notebooks powered by <a href="https://marimo.io/" target="_blank">marimo</a>.</p>
+              
+              <ul class="notebook-list">
+          EOF
+          
+          # Add each exported notebook to the index
+          for html_file in dist/*.html; do
+            if [ -f "$html_file" ] && [ "$(basename "$html_file")" != "index.html" ]; then
+              notebook_name=$(basename "$html_file" .html)
+              # Convert underscores to spaces and capitalize for display
+              display_name=$(echo "$notebook_name" | sed 's/_/ /g' | sed 's/\b\(.\)/\u\1/g')
+              echo "                  <li><a href=\"${notebook_name}.html\">📓 ${display_name}</a></li>" >> dist/index.html
+            fi
+          done
+          
+          cat >> dist/index.html << 'EOF'
+              </ul>
+              
+              <footer>
+                  <p>Built with <a href="https://marimo.io/" target="_blank">marimo</a> • 
+                  <a href="https://github.com/bsprenger/marimo-notebooks" class="github-link" target="_blank">View on GitHub</a></p>
+              </footer>
+          </body>
+          </html>
+          EOF
+          
+          echo "✅ All notebooks exported successfully!"
+          echo "📊 Generated files:"
+          ls -lh dist/
+
+      - name: 📦 Upload Pages Artifact
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      - name: 🌐 Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4

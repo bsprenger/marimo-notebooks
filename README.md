@@ -48,9 +48,19 @@ marimo-notebooks/
 └── README.md
 ```
 
+## Viewing Notebooks Online
+
+All notebooks are automatically deployed to GitHub Pages and can be viewed interactively in your browser without any local setup!
+
+**[🌐 View Notebooks Online](https://bsprenger.github.io/marimo-notebooks/)**
+
 ## Adding New Notebooks
 
 Create new marimo notebooks in the `notebooks/` directory. Each notebook is independent and can be run separately.
+
+**To deploy a new notebook to GitHub Pages:** Simply add your `.py` notebook file to the `notebooks/` directory and push to the `main` branch. The GitHub Actions workflow will automatically export and deploy it.
+
+See [`.github/DEPLOYMENT.md`](.github/DEPLOYMENT.md) for detailed deployment instructions.
 
 ## Dependencies
 
