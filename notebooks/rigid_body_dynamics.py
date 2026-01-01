@@ -6,7 +6,7 @@ __generated_with = "0.1.0"
 app = marimo.App(width="full")
 
 @app.cell
-def _():
+def __():
     import marimo as mo
     import matplotlib.pyplot as plt
     import numpy as np
@@ -14,7 +14,7 @@ def _():
     return Circle, FancyArrowPatch, Rectangle, mo, np, plt
 
 @app.cell
-def _(mo):
+def __(mo):
     mo.md(
         """
         # 🍎 The Physics of Movement: Rigid Body Dynamics
@@ -31,10 +31,10 @@ def _(mo):
         Use this notebook to feel what each term actually does.
         """
     )
-    return
+    return ()
 
 @app.cell
-def _(mo):
+def __(mo):
     # --- CONTROLS ---
 
     # Simulation Settings
@@ -71,7 +71,7 @@ def _(mo):
     return f_ext_x, f_ext_y, gravity_comp, sim_mode, theta1, theta2
 
 @app.cell
-def _(f_ext_x, f_ext_y, np, theta1, theta2):
+def __(f_ext_x, f_ext_y, np, theta1, theta2):
     # --- DYNAMICS ENGINE ---
 
     # Parameters
@@ -155,7 +155,7 @@ def _(f_ext_x, f_ext_y, np, theta1, theta2):
     )
 
 @app.cell
-def _(
+def __(
     Circle,
     F_ext,
     FancyArrowPatch,
@@ -290,21 +290,20 @@ def _(
     return j_display, m_display, plot_widget, t_g
 
 @app.cell
-def _(j_display, m_display, mo, plot_widget):
+def __(j_display, m_display, mo, plot_widget):
     mo.hstack([
         plot_widget,
         mo.vstack([m_display, j_display])
     ])
-    return
+    return ()
 
 @app.cell
-def _(mo):
+def __(mo):
     mo.md(
         """
         ### 🧠 Pedagogical Insights
 
         **1. The "Effective Inertia" ($M$)**
-        [attachment_0](attachment)
         * Try extending the arm fully (0, 0). Look at $M_{11}$ (approx 3.8).
         * Now fold the elbow back to 180. Look at $M_{11}$ (approx 0.8).
         * **Robotics Insight:** It is 4x harder for the motor to accelerate
@@ -320,7 +319,7 @@ def _(mo):
         weak in others.
         """
     )
-    return
+    return ()
 
 if __name__ == "__main__":
     app.run()
