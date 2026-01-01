@@ -80,9 +80,8 @@ def __(lock_demo, np, pitch, roll, yaw):
     p_val = 90 if lock_demo.value else pitch.value
     y_val = yaw.value
 
-    # Create Rotation Object (ZYX convention is standard for mobile robots)
-    # Note: 'xyz' in scipy refers to extrinsic (static frame), 'XYZ' is intrinsic (moving frame)
-    # Robotics usually uses Intrinsic rotations.
+    # Create Rotation Object using extrinsic XYZ convention
+    # (rotation about fixed world axes in the order: X, then Y, then Z)
     rot = R.from_euler("xyz", [r_val, p_val, y_val], degrees=True)
 
     # Extract Quaternion
@@ -134,7 +133,6 @@ def __(Poly3DCollection, matrix, mo, np, p_val, plt, quat, r_val, y_val):
     ax.add_collection3d(poly)
 
     # 3. Draw Local Axes (The Gimbal Rings)
-    np.array([0, 0, 0])
     # X Axis (Red) - Forward
     x_axis = matrix @ np.array([2, 0, 0])
     ax.quiver(
